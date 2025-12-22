@@ -1,0 +1,9 @@
+#!/bin/bash
+curl -s --fail https://pokeapi.co/api/v2/pokemon/9/ >data.json 2>errors.txt
+status=$?
+
+if [ "$status" -ne 0 ]; then
+	echo "Date: $(date) - Exit Status: $status" >>errors.txt
+else
+	exit 0
+fi
