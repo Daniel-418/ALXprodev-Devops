@@ -1,0 +1,16 @@
+{
+	"user": {
+		"name": "Alice",
+		"location": "Wonderland"
+	},
+	"posts": [
+		{
+			"title": "Down the hole",
+			"likes": 10
+		},
+		{
+			"title": "Tea party",
+			"likes": 25
+		}
+	]
+}

@@ -1,0 +1,4 @@
+#!/bin/bash
+jq -r '"\(.name) \(.weight / 10) \(.height / 10) \(.types[0].type.name)"' data.json |
+	sed 's/\<./\u&/g' |
+	awk '{ print $1 " is of type " $4 ", weighs " $3 "kg, and is " $3 "m tall."}'
