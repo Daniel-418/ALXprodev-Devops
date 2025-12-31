@@ -1,19 +1,33 @@
 #!/bin/bash
 pokemons=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
 mkdir -p pokemon_data
+max_retries=3
 
 for pokemon in "${pokemons[@]}"; do
 	echo "Fetching data for $pokemon..."
 
 	filepath="pokemon_data/$pokemon.json"
-	curl -s --fail https://pokeapi.co/api/v2/pokemon/"$pokemon"/ >"$filepath" 2>>errors.txt
-	status=$?
+	attempts=1
+	success=false
 
-	if [ "$status" -eq 0 ]; then
-		echo "Saved data to $filepath"
-	else
-		echo "Failed to retrieve $pokemon. exit_code: $status"
+	while [ "$attempts" -le "$max_retries" ]; do
+		curl -s --fail https://pokeapi.co/api/v2/pokemon/"$pokemon"/ >"$filepath" 2>>errors.txt
+		status=$?
+		if [ "$status" -eq 0 ]; then
+			success=true
+			break
+		else
+			echo "Attempt $attempts failed for $pokemon"
+			((attempts++))
+			echo "retrying..."
+			sleep 2
+		fi
+	done
+	if [ "$success" = false ]; then
+		echo "Failed to retrieve $pokemon. exit_code: $status" >>fetching_errors.txt
 		rm -f "$filepath"
+	else
+		echo "Saved data to $filepath"
 	fi
 
 	sleep 5
