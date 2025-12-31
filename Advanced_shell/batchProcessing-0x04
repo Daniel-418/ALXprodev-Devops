@@ -2,6 +2,7 @@
 pokemons=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
 mkdir -p pokemon_data
 max_retries=3
+pids=()
 
 for pokemon in "${pokemons[@]}"; do
 	(
@@ -14,6 +15,7 @@ for pokemon in "${pokemons[@]}"; do
 		while [ "$attempts" -le "$max_retries" ]; do
 			curl -s --fail https://pokeapi.co/api/v2/pokemon/"$pokemon"/ >"$filepath" 2>>errors.txt
 			status=$?
+			sleep 3
 			if [ "$status" -eq 0 ]; then
 				success=true
 				break
@@ -30,6 +32,29 @@ for pokemon in "${pokemons[@]}"; do
 			echo "Saved data to $filepath"
 		fi
 	) &
+
+	pid=$!
+	pids+=("$pid")
+	echo "Started fetchin $pokemon on PID $pid"
 done
 
-wait
+while [ ${#pids[@]} -gt 0 ]; do
+
+	running_pids=()
+
+	for pid in "${pids[@]}"; do
+		if kill -0 "$pid" 2>/dev/null; then
+			running_pids+=("$pid")
+		else
+			echo "Process $pid has completed."
+		fi
+	done
+
+	pids=("${running_pids[@]}")
+
+	if [ ${#pids[@]} -gt 0 ]; then
+		sleep 1
+	fi
+done
+
+echo "All processes finished."
