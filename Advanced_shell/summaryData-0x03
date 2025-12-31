@@ -1,0 +1,27 @@
+#!/bin/bash
+filepath="pokemon_data/"
+csv_path="pokemon_report.csv"
+
+echo "Name,Height (m),Weight (kg)" >$csv_path
+
+for file in "$filepath"*; do
+	jq -r '"\(.name),\(.height / 10),\(.weight / 10)"' "$file" |
+		sed 's/\<./\u&/g' >>"$csv_path"
+done
+
+echo "CSV report generated at $csv_path"
+echo ""
+cat "$csv_path"
+echo ""
+cat "$csv_path" | awk -F',' 'NR > 1 {
+	totalHeight += $2;
+	totalWeight += $3;
+	count++
+} END {
+	if (count > 0) {
+		printf "Average Height: %.2f m\n", totalHeight / count;
+		printf "Average Weight: %.2f kg\n", totalWeight / count;
+	} else {
+		print "No data found."
+	}
+}'
