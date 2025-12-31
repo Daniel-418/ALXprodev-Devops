@@ -39,6 +39,7 @@ for pokemon in "${pokemons[@]}"; do
 done
 
 while [ ${#pids[@]} -gt 0 ]; do
+	# jobs
 
 	running_pids=()
 
